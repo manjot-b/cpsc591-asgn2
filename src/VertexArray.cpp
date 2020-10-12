@@ -1,18 +1,24 @@
 #include <glad/glad.h>
 #include "VertexArray.h"
 
-VertexArray::VertexArray(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices)
+VertexArray::VertexArray(const std::vector<Vertex> &vertices,
+		GLenum vertexUsage,
+		const std::vector<unsigned int>* indices,
+		GLenum indicesUsage)
 {
     glGenBuffers(1, &vertexBufferId); // gen buffer and store id in VBO
-	glGenBuffers(1, &elementBufferId);
+	glGenBuffers(1, &elementBufferId); // create even if indices not provied.
 	glGenVertexArrays(1, &id);
     
     glBindVertexArray(id);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId);
-	glBufferData(GL_ARRAY_BUFFER,  vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,  vertices.size() * sizeof(Vertex), vertices.data(), vertexUsage);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferId);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,  indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+	if (indices)
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferId);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER,  indices->size() * sizeof(unsigned int), indices->data(), indicesUsage);
+	}
 
 	// set the vertex attribute pointers
 	// vertex Positions
@@ -44,4 +50,18 @@ unsigned int VertexArray::getId() const
 void VertexArray::bind() const
 {
 	glBindVertexArray(id);
+}
+
+/**
+ * Sends the data stored in indices to the element buffer associated with this VertexArray.
+ */
+void VertexArray::updateElementBuffer(const std::vector<unsigned int> &indices, GLenum usage)
+{
+    glBindVertexArray(id);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferId);
+
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,  indices.size() * sizeof(unsigned int), indices.data(), usage);
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

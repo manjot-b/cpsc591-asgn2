@@ -2,6 +2,7 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include <iostream>
 #include <filesystem>
@@ -16,8 +17,9 @@ Renderer::Renderer(const char* modelDirectory) :
 	initWindow();
 	shader = std::make_unique<Shader>("shaders/vertex.glsl", "shaders/fragment.glsl");
 	shader->link();
+
 	loadModels(modelDirectory);	
-	
+
 	perspective = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
 	shader->use();
 	shader->setUniformMatrix4fv("perspective", perspective);
@@ -35,7 +37,7 @@ void Renderer::initWindow()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow(width, height, "OpenGL Example", nullptr, nullptr);
+	window = glfwCreateWindow(width, height, "Edge Buffer", nullptr, nullptr);
 	if (!window)
 	{
 		std::cerr << "Failed to create GLFW window" << std::endl;
@@ -108,7 +110,6 @@ void Renderer::loadModels(const char* modelDirectory)
 
 void Renderer::run()
 {
-
 	while(!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
@@ -129,6 +130,10 @@ void Renderer::run()
 		models[modelIndex]->scale(scale);
 		models[modelIndex]->update();
 		models[modelIndex]->draw();
+
+		models[modelIndex]->updateEdgeBuffer(camera.getDirection());
+		models[modelIndex]->drawEdgeBuffer();
+		models[modelIndex]->resetEdgeBuffer();
 
 		rotate = glm::vec3(0.0f);
 		scale = 1;
@@ -245,8 +250,18 @@ void Renderer::keyCallback(GLFWwindow* window, int key, int scancode, int action
 				break;
 
 			// Select model
+			case GLFW_KEY_0:
+				renderer->modelIndex = 9;
+				break;
 			case GLFW_KEY_1:
 			case GLFW_KEY_2:
+			case GLFW_KEY_3:
+			case GLFW_KEY_4:
+			case GLFW_KEY_5:
+			case GLFW_KEY_6:
+			case GLFW_KEY_7:
+			case GLFW_KEY_8:
+			case GLFW_KEY_9:
 				renderer->modelIndex = key - GLFW_KEY_1;
 				break;
 		}

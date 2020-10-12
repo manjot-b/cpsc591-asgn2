@@ -1,11 +1,12 @@
 #pragma once
 
-#include <string>
 #include <glm/glm.hpp>
+#include <string>
 #include <memory>
 
 #include "Shader.h"
 #include "Mesh.h"
+#include "EdgeBuffer.h"
 
 class Model
 {
@@ -16,10 +17,15 @@ class Model
 		void update();
 		void rotate(const glm::vec3 &rotate);
 		void scale(float scale);
+		void updateEdgeBuffer(const glm::vec3& cameraPosition);
+		void drawEdgeBuffer() const;
+		void resetEdgeBuffer();
 
 	private:
+
 		const Shader& shader;
 		std::vector<std::unique_ptr<Mesh>> meshes;
+		std::unique_ptr<EdgeBuffer> edgeBuffer;
 
 		BoundingBox boundingBox;
 		glm::mat4 modelMatrix;

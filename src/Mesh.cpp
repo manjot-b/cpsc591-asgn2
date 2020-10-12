@@ -5,7 +5,7 @@
 Mesh::Mesh(const aiMesh* mesh)
 {
 	extractDataFromMesh(mesh);
-	vertexArray = std::make_unique<VertexArray>(vertices, indices);
+	vertexArray = std::make_unique<VertexArray>(vertices, GL_STATIC_DRAW, &indices, GL_STATIC_DRAW);
 	calcBoundingBox();
 }
 

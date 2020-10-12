@@ -12,6 +12,9 @@ struct BoundingBox
 
 class Mesh
 {
+	// Grant Model access to private members.
+	friend class Model;
+
 	public:
 		Mesh(const aiMesh* mesh);
 		~Mesh();

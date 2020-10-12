@@ -7,25 +7,26 @@
 #include <iostream>
 
 #include "Model.h"
+#include "Vertex.h"
 
 Model::Model(const std::string &objPath, const Shader& shader) :
 	shader(shader), modelMatrix(1.0f), m_rotate(0), m_scale(1), m_translation(0)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(objPath,
-			aiProcess_Triangulate | aiProcess_GenSmoothNormals);	
+			aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_GenSmoothNormals);	
 	if (!scene)
 	{
 		std::cerr <<  "Error loading " << objPath << ".\n" << importer.GetErrorString() << std::endl;
 	}
 
 	extractDataFromNode(scene, scene->mRootNode);	
-
 	scaleToViewport();
-	// Scale model so that the longest side of its BoundingBox
-	// has a length of 1.
-//	m_scale = 1 / glm::max(boundingBox.width, glm::max(boundingBox.height, boundingBox.depth));
-//	update();
+
+	// Assume that there is only a single mesh for this assignment.
+	// It shouldn't be too difficult if the object is made up of multiple meshes.
+	// We would simply have to store an edgebuffer for each mesh.
+	edgeBuffer = std::make_unique<EdgeBuffer>(meshes[0]->vertices, meshes[0]->indices);
 }
 
 Model::~Model() {}
@@ -59,11 +60,23 @@ void Model::draw() const
 {
 	shader.use();
 	shader.setUniformMatrix4fv("model", modelMatrix);
-
+	shader.setUniform3fv("color", glm::vec3(1.0f, 1.0f, 1.0f));
 	for(auto &mesh : meshes)
 	{
 		mesh->draw();
 	}
+	glUseProgram(0);
+}
+
+/**
+ * Draws the lines based on the edge buffer.
+ */
+void Model::drawEdgeBuffer() const
+{
+	shader.use();
+	shader.setUniformMatrix4fv("model", modelMatrix);
+	shader.setUniform3fv("color", glm::vec3(1.0f, 0, 0));
+	edgeBuffer->draw();
 	glUseProgram(0);
 }
 
@@ -140,3 +153,12 @@ void Model::scaleToViewport()
 	update();
 }
 
+void Model::updateEdgeBuffer(const glm::vec3& cameraPosition)
+{
+	edgeBuffer->update(cameraPosition, modelMatrix);
+}
+
+void Model::resetEdgeBuffer()
+{
+	edgeBuffer->reset();
+}

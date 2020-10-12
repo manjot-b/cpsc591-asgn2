@@ -1,4 +1,4 @@
-EXECUTABLE=myapp
+EXECUTABLE=edgebuf
 
 INCDIR=inc
 SRCDIR=src
