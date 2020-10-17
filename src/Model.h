@@ -20,6 +20,7 @@ class Model
 		void updateEdgeBuffer(const glm::vec3& cameraPosition);
 		void drawEdgeBuffer() const;
 		void resetEdgeBuffer();
+		void reset();
 
 	private:
 

@@ -249,6 +249,10 @@ void Renderer::keyCallback(GLFWwindow* window, int key, int scancode, int action
 				glfwSetWindowShouldClose(window, true);
 				break;
 
+			case GLFW_KEY_R:
+				renderer->reset();
+				break;
+
 			// Select model
 			case GLFW_KEY_0:
 				renderer->modelIndex = 9;
@@ -286,4 +290,17 @@ void Renderer::mouseCallback(GLFWwindow* window, double xpos, double ypos)
     renderer->lastY = ypos;
 
     renderer->camera.processMouseMovement(xoffset, yoffset);
+}
+
+/**
+ * Reset camera and models to default positions.
+ */
+void Renderer::reset()
+{
+	camera = Camera();
+
+	for (auto& model : models)
+	{
+		model->reset();
+	}
 }

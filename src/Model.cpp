@@ -158,6 +158,16 @@ void Model::updateEdgeBuffer(const glm::vec3& cameraPosition)
 	edgeBuffer->update(cameraPosition, modelMatrix);
 }
 
+/**
+ *	Resets the model matrix and edge buffer.
+ */
+void Model::reset()
+{
+	modelMatrix = glm::mat4(1.0f);
+	scaleToViewport();
+	resetEdgeBuffer();
+}
+
 void Model::resetEdgeBuffer()
 {
 	edgeBuffer->reset();
