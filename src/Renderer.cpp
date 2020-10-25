@@ -135,6 +135,7 @@ void Renderer::run()
 
 		goochShader->use();
 		goochShader->setUniformMatrix4fv("view", camera.getViewMatrix());
+		goochShader->setUniform3fv("toCamera", camera.getPosition());
 		goochShader->setUniform3fv("color", modelColor);
 		goochShader->setUniform3fv("blue", blue);
 		goochShader->setUniform3fv("yellow", yellow);

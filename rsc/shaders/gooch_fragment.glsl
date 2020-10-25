@@ -9,19 +9,32 @@ uniform vec3 yellow;
 uniform float coolIntensity;
 uniform float warmIntensity;
 uniform vec3 lightColor;
+uniform vec3 toCamera;
 
 out vec4 fragColor;
 
 void main()
 { 
-	// GOOCH DIFFUSE LIGHTING
+	// GOOCH LIGHTING
 	vec3 unitNormal = normalize(surfaceNormal);
 	vec3 unitLightToFrag = normalize(lightToFrag);
-	float diffBrightness = (1 + dot(unitNormal, unitLightToFrag)) * 0.5f;
-	vec3 cool = diffBrightness * (blue + coolIntensity * color);
-	vec3 warm = (1 - diffBrightness) * (yellow + warmIntensity * color);
+	float blend = (1 + dot(unitNormal, unitLightToFrag)) * 0.5f;
+	vec3 cool = blend * (blue + coolIntensity * color);
+	vec3 warm = (1 - blend) * (yellow + warmIntensity * color);
+	vec3 gooch = cool + warm;
 	
-	vec3 finalColor = cool + warm;
+	// SPECULAR LIGHTING
+	float shininess = 32.0f;
+	float specularCoeff = 0.5f;
+	vec3 unitToCamera = normalize(toCamera);
+	//vec3 reflectedDir = unitLightToFrag - 2 * max(dot(unitLightToFrag, unitNormal), 0) * unitNormal;
+	vec3 reflectedDir = 2 * dot(-unitLightToFrag, unitNormal) * unitNormal + unitLightToFrag;
+	reflectedDir = normalize(reflectedDir);
+	float specularFactor = max(dot(reflectedDir, unitToCamera), 0);
+	float dampedFactor = pow(specularFactor, shininess);
+	vec3 specular = dampedFactor * specularCoeff * lightColor;
+
+	vec3 finalColor = gooch + specular;
 
 	fragColor = vec4(finalColor, 1.0f);
 }
