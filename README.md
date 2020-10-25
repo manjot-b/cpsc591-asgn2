@@ -38,7 +38,13 @@ Head into the **bin/** directory and enter `./edgebuf <model directory>`, where 
 - Camera Movement *SHIFT + W, A, S, D, E, Q*.
 - Camera Direction *MOVE CURSOR*.
 - Select Model *0-9*.
-- Reset Camera and Models *R*.
+- Reset Camera and Models *T*.
+- Increase Model kd (color) *R, G, B*
+- Decrease Model kd (color) *SHIFT + R, G, B*
+- Increase / Decrease Blue *C / SHIFT + C*
+- Increase / Decrease Yellow *V / SHIFT + V*
+- Increase / Decrease Alpha *H / SHIFT + H*
+- Increase / Decrease Beta *J / SHIFT + J*
 
 ## TODO
 - Migrate over to `CMake` instead of using `Makefile`. This will make the project platform independant.

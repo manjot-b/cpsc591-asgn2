@@ -162,7 +162,11 @@ void Renderer::run()
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
+		printSettings(true);
 	}
+	// Print settings but don't clear. Just for reference.
+	printSettings(false);
 }
 
 /*
@@ -262,34 +266,88 @@ void Renderer::processWindowInput()
 void Renderer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
+	float change = 0.05f;
 	
-	if (action == GLFW_PRESS)
+	if (action == GLFW_PRESS || action == GLFW_REPEAT)
 	{
-		switch(key)
+		if (!(mods & GLFW_MOD_SHIFT))
 		{
-			case GLFW_KEY_ESCAPE:
-				glfwSetWindowShouldClose(window, true);
-				break;
+			switch(key)
+			{
+				case GLFW_KEY_ESCAPE:
+					glfwSetWindowShouldClose(window, true);
+					break;
 
-			case GLFW_KEY_R:
-				renderer->reset();
-				break;
+				case GLFW_KEY_T:
+					renderer->reset();
+					break;
 
-			// Select model
-			case GLFW_KEY_0:
-				renderer->modelIndex = 9;
-				break;
-			case GLFW_KEY_1:
-			case GLFW_KEY_2:
-			case GLFW_KEY_3:
-			case GLFW_KEY_4:
-			case GLFW_KEY_5:
-			case GLFW_KEY_6:
-			case GLFW_KEY_7:
-			case GLFW_KEY_8:
-			case GLFW_KEY_9:
-				renderer->modelIndex = key - GLFW_KEY_1;
-				break;
+				// Select model
+				case GLFW_KEY_0:
+					renderer->modelIndex = 9;
+					break;
+				case GLFW_KEY_1:
+				case GLFW_KEY_2:
+				case GLFW_KEY_3:
+				case GLFW_KEY_4:
+				case GLFW_KEY_5:
+				case GLFW_KEY_6:
+				case GLFW_KEY_7:
+				case GLFW_KEY_8:
+				case GLFW_KEY_9:
+					renderer->modelIndex = key - GLFW_KEY_1;
+					break;
+				case GLFW_KEY_R:
+					renderer->modelColor.r = glm::min(renderer->modelColor.r+change, 1.0f);
+					break;
+				case GLFW_KEY_G:
+					renderer->modelColor.g = glm::min(renderer->modelColor.g+change, 1.0f);
+					break;
+				case GLFW_KEY_B:
+					renderer->modelColor.b = glm::min(renderer->modelColor.b+change, 1.0f);
+					break;
+				case GLFW_KEY_C:
+					renderer->blue.b = glm::min(renderer->blue.b+change, 1.0f);
+					break;
+				case GLFW_KEY_V:
+					renderer->yellow.r = glm::min(renderer->yellow.r+change, 1.0f);
+					renderer->yellow.g = glm::min(renderer->yellow.g+change, 1.0f);
+					break;
+				case GLFW_KEY_H:
+					renderer->coolIntensity = glm::min(renderer->coolIntensity+change, 1.0f);
+					break;
+				case GLFW_KEY_J:
+					renderer->warmIntensity = glm::min(renderer->warmIntensity+change, 1.0f);
+					break;
+			}
+		}
+		else // Shift pressed
+		{
+			switch (key)
+			{
+				case GLFW_KEY_R:
+					renderer->modelColor.r = glm::max(renderer->modelColor.r-change, 0.0f);
+					break;
+				case GLFW_KEY_G:
+					renderer->modelColor.g = glm::max(renderer->modelColor.g-change, 0.0f);
+					break;
+				case GLFW_KEY_B:
+					renderer->modelColor.b = glm::max(renderer->modelColor.b-change, 0.0f);
+					break;
+				case GLFW_KEY_C:
+					renderer->blue.b = glm::max(renderer->blue.b-change, 0.0f);
+					break;
+				case GLFW_KEY_V:
+					renderer->yellow.r = glm::max(renderer->yellow.r-change, 0.0f);
+					renderer->yellow.g = glm::max(renderer->yellow.g-change, 0.0f);
+					break;
+				case GLFW_KEY_H:
+					renderer->coolIntensity = glm::max(renderer->coolIntensity-change, 0.0f);
+					break;
+				case GLFW_KEY_J:
+					renderer->warmIntensity = glm::max(renderer->warmIntensity-change, 0.0f);
+					break;
+			}
 		}
 	}
 }
@@ -324,5 +382,29 @@ void Renderer::reset()
 	for (auto& model : models)
 	{
 		model->reset();
+	}
+}
+
+void Renderer::printSettings(bool clear)
+{
+	unsigned int lines = 6;
+
+	std::cout << "Model: " <<  modelIndex + 1 << '\n'
+	   << "Color: " << modelColor.r << " " << modelColor.g << " " << modelColor.b << '\n'
+	   << "Blue: " << blue.r << " " << blue.g << " " << blue.b << '\n'
+	   << "Yellow: " << yellow.r << " " << yellow.g << " " << yellow.b << '\n'
+	   << "Alpha: " << coolIntensity << '\n'
+	   << "Beta: " << warmIntensity << '\n';
+
+	if (clear) {
+		// Move to beginning of line
+		std::cout << '\r';
+		for(; lines > 0; lines--)
+		{
+			// move up a line
+			std::cout << "\e[A";
+		}
+		// Erase screen from current line down.
+		std::cout << "\e[J";
 	}
 }
