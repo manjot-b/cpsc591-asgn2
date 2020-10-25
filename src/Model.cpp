@@ -9,8 +9,8 @@
 #include "Model.h"
 #include "Vertex.h"
 
-Model::Model(const std::string &objPath, const Shader& shader) :
-	shader(shader), modelMatrix(1.0f), m_rotate(0), m_scale(1), m_translation(0)
+Model::Model(const std::string &objPath) :
+	 modelMatrix(1.0f), m_rotate(0), m_scale(1), m_translation(0)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(objPath,
@@ -55,29 +55,27 @@ void Model::extractDataFromNode(const aiScene* scene, const aiNode* node)
 
 /**
  * Draws the model. Remember to update() the model first.
+ * Assumes the shader is already in use.
  */
-void Model::draw() const
+void Model::draw(const Shader& shader) const
 {
-	shader.use();
 	shader.setUniformMatrix4fv("model", modelMatrix);
 	shader.setUniform3fv("color", glm::vec3(1.0f, 1.0f, 1.0f));
 	for(auto &mesh : meshes)
 	{
 		mesh->draw();
 	}
-	glUseProgram(0);
 }
 
 /**
  * Draws the lines based on the edge buffer.
+ * Assumes the shader is already in use.
  */
-void Model::drawEdgeBuffer() const
+void Model::drawEdgeBuffer(const Shader& shader) const
 {
-	shader.use();
 	shader.setUniformMatrix4fv("model", modelMatrix);
 	shader.setUniform3fv("color", glm::vec3(1.0f, 0, 0));
 	edgeBuffer->draw();
-	glUseProgram(0);
 }
 
 /**

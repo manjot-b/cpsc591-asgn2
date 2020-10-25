@@ -11,20 +11,18 @@
 class Model
 {
 	public:
-		Model(const std::string &objPath, const Shader& shader);
+		Model(const std::string &objPath);
 		~Model();
-		void draw() const;
+		void draw(const Shader& shader) const;
 		void update();
 		void rotate(const glm::vec3 &rotate);
 		void scale(float scale);
 		void updateEdgeBuffer(const glm::vec3& cameraPosition);
-		void drawEdgeBuffer() const;
+		void drawEdgeBuffer(const Shader& shader) const;
 		void resetEdgeBuffer();
 		void reset();
 
 	private:
-
-		const Shader& shader;
 		std::vector<std::unique_ptr<Mesh>> meshes;
 		std::unique_ptr<EdgeBuffer> edgeBuffer;
 

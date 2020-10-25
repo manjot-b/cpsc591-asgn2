@@ -101,7 +101,7 @@ void Renderer::loadModels(const char* modelDirectory)
 		if (entry.is_regular_file() && entry.path().extension() == extension)
 		{
 			std::cout << "Loading " << entry.path() << "..." << std::flush;
-			models.push_back(std::make_unique<Model>(entry.path(), *shader));
+			models.push_back(std::make_unique<Model>(entry.path()));
 			std::cout << "Done! Index: " << count << "\n";
 			count++;
 		}
@@ -124,16 +124,17 @@ void Renderer::run()
 
 		shader->use();
 		shader->setUniformMatrix4fv("view", camera.getViewMatrix());
-		glUseProgram(0);
 
 		models[modelIndex]->rotate(rotate);
 		models[modelIndex]->scale(scale);
 		models[modelIndex]->update();
-		models[modelIndex]->draw();
+		models[modelIndex]->draw(*shader);
 
 		models[modelIndex]->updateEdgeBuffer(camera.getDirection());
-		models[modelIndex]->drawEdgeBuffer();
+		models[modelIndex]->drawEdgeBuffer(*shader);
 		models[modelIndex]->resetEdgeBuffer();
+
+		glUseProgram(0);
 
 		rotate = glm::vec3(0.0f);
 		scale = 1;
