@@ -151,7 +151,7 @@ void Renderer::run()
 		edgeShader->setUniformMatrix4fv("view", camera.getViewMatrix());
 		edgeShader->setUniform3fv("color", glm::vec3(0.0f, 0.0f, 0.0f));
 
-		models[modelIndex]->updateEdgeBuffer(camera.getDirection());
+		models[modelIndex]->updateEdgeBuffer(camera.getPosition());
 		models[modelIndex]->drawEdgeBuffer(*edgeShader);
 		models[modelIndex]->resetEdgeBuffer();
 
