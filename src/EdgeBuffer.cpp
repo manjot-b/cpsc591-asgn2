@@ -95,7 +95,7 @@ void EdgeBuffer::insertEdge(unsigned int index0, unsigned int index1)
 void EdgeBuffer::draw() const
 {
 	edgeVertexArray->bind();
-	glLineWidth(4.0f);
+	glLineWidth(3.0f);
 	glDrawElements(GL_LINES, edgeIndices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }

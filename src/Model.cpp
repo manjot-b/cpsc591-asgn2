@@ -60,7 +60,6 @@ void Model::extractDataFromNode(const aiScene* scene, const aiNode* node)
 void Model::draw(const Shader& shader) const
 {
 	shader.setUniformMatrix4fv("model", modelMatrix);
-	shader.setUniform3fv("color", glm::vec3(1.0f, 1.0f, 1.0f));
 	for(auto &mesh : meshes)
 	{
 		mesh->draw();
@@ -74,7 +73,6 @@ void Model::draw(const Shader& shader) const
 void Model::drawEdgeBuffer(const Shader& shader) const
 {
 	shader.setUniformMatrix4fv("model", modelMatrix);
-	shader.setUniform3fv("color", glm::vec3(1.0f, 0, 0));
 	edgeBuffer->draw();
 }
 

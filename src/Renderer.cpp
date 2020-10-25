@@ -12,18 +12,29 @@
 Renderer::Renderer(const char* modelDirectory) :
 	modelIndex(0), rotate(0), scale(1),
 	firstMouse(true), lastX(width / 2.0f), lastY(height / 2.0f),
-	shiftPressed(false), deltaTime(0.0f), lastFrame(0.0f)
+	shiftPressed(false), deltaTime(0.0f), lastFrame(0.0f),
+	lightPosition(0.0f, 0.0f, 2.0f), lightColor(1.0f, 1.0f, 1.0f),
+	modelColor(0.7f, 0.0f, 0.0f), blue(0.0f, 0.0f, 1.0f), yellow(1.0f, 1.0f, 0.0f),
+	coolIntensity(0.5f), warmIntensity(0.5f)
 {
 	initWindow();
-	shader = std::make_unique<Shader>("shaders/vertex.glsl", "shaders/fragment.glsl");
-	shader->link();
+	edgeShader = std::make_unique<Shader>("shaders/edge_vertex.glsl", "shaders/edge_fragment.glsl");
+	edgeShader->link();
+	goochShader = std::make_unique<Shader>("shaders/gooch_vertex.glsl", "shaders/gooch_fragment.glsl");
+	goochShader->link();
 
 	loadModels(modelDirectory);	
 
 	perspective = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
-	shader->use();
-	shader->setUniformMatrix4fv("perspective", perspective);
-	shader->setUniformMatrix4fv("view", camera.getViewMatrix());
+	edgeShader->use();
+	edgeShader->setUniformMatrix4fv("perspective", perspective);
+	edgeShader->setUniformMatrix4fv("view", camera.getViewMatrix());
+
+	goochShader->use();
+	goochShader->setUniformMatrix4fv("perspective", perspective);
+	goochShader->setUniformMatrix4fv("view", camera.getViewMatrix());
+	goochShader->setUniform3fv("lightPosition", lightPosition);
+	goochShader->setUniform3fv("lightColor", lightColor);
 	glUseProgram(0);	// unbind shader
 }
 
@@ -116,22 +127,31 @@ void Renderer::run()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		processWindowInput();
 
-		shader->use();
-		shader->setUniformMatrix4fv("view", camera.getViewMatrix());
+		goochShader->use();
+		goochShader->setUniformMatrix4fv("view", camera.getViewMatrix());
+		goochShader->setUniform3fv("color", modelColor);
+		goochShader->setUniform3fv("blue", blue);
+		goochShader->setUniform3fv("yellow", yellow);
+		goochShader->setUniform1f("coolIntensity", coolIntensity);
+		goochShader->setUniform1f("warmIntensity", warmIntensity);
 
 		models[modelIndex]->rotate(rotate);
 		models[modelIndex]->scale(scale);
 		models[modelIndex]->update();
-		models[modelIndex]->draw(*shader);
+		models[modelIndex]->draw(*goochShader);
+
+		edgeShader->use();
+		edgeShader->setUniformMatrix4fv("view", camera.getViewMatrix());
+		edgeShader->setUniform3fv("color", glm::vec3(0.0f, 0.0f, 0.0f));
 
 		models[modelIndex]->updateEdgeBuffer(camera.getDirection());
-		models[modelIndex]->drawEdgeBuffer(*shader);
+		models[modelIndex]->drawEdgeBuffer(*edgeShader);
 		models[modelIndex]->resetEdgeBuffer();
 
 		glUseProgram(0);

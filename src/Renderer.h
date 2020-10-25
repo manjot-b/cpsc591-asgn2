@@ -21,7 +21,8 @@ class Renderer
 
 	private:
 		GLFWwindow* window;
-		std::unique_ptr<Shader> shader;
+		std::unique_ptr<Shader> edgeShader;
+		std::unique_ptr<Shader> goochShader;
 		std::vector<std::unique_ptr<Model>> models;
 		unsigned int modelIndex;
 		
@@ -41,6 +42,14 @@ class Renderer
 
 		float deltaTime;
 		float lastFrame;
+
+		glm::vec3 lightPosition;
+		glm::vec3 lightColor;
+		glm::vec3 modelColor;
+		glm::vec3 blue;
+		glm::vec3 yellow;
+		float coolIntensity;
+		float warmIntensity;
 
 		void initWindow();
 		void loadModels(const char* modelDirectory);
